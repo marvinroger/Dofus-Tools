@@ -48,7 +48,7 @@ The above exemple build the same file as the template as it build the same files
 
 ###SWL files
 
-A SWL file contains one and only one SWL file. This is a packaged filetype that we can encounter when extracting D2P file.
+A SWL file contains one and only one SWF file. This is a packaged filetype that we can encounter when extracting D2P file.
 
 #####Decompilation
 
