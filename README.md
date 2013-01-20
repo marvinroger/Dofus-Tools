@@ -10,8 +10,6 @@ Usage
 
 A D2P file contains the resources of the game, like audio, sprites or SWL files.
 
-####Usage
-
 #####Decompilation
 
 ```python
@@ -51,8 +49,6 @@ The above exemple build the same file as the template as it build the same files
 ###SWL files
 
 A SWL file contains one and only one SWL file. This is a packaged filetype that we can encounter when extracting D2P file.
-
-####Usage
 
 #####Decompilation
 
