@@ -15,13 +15,13 @@ A D2P file contains the resources of the game, like audio, sprites or SWL files.
 ```python
 from D2P import *
 
-D2PStream = open("./MyD2PFile.d2p", "rb") //Open the D2P file in binary mode
+D2PStream = open("./MyD2PFile.d2p", "rb") #Open the D2P file in binary mode
 D2P = D2PFile()
 try:
-    D2P.Populate(D2PStream) //Populate the D2P object with a D2P file. Must be a stream
+    D2P.Populate(D2PStream) #Populate the D2P object with a D2P file. Must be a stream
     for Name, File in D2P.Files.item():
-	pass //Do whatever you want with Name the name of the file and File a ByteArray containing the file
-except D2PInvalidFile: //Raised when the D2P file is incorrect
+	pass #Do whatever you want with Name the name of the file and File a ByteArray containing the file
+except D2PInvalidFile: #Raised when the D2P file is incorrect
     pass
 ```
 
@@ -39,8 +39,8 @@ D2P.Populate(D2PTemplateStream)
 
 D2PStream = open("./MyCustomD2PFile.d2p", "wb")
 D2P = D2PFile()
-D2P.Template = D2PTemplate //Specify the template D2P file
-D2P.Files = D2PTemplate.Files //Specify the files that will be builded {Filename => ByteArray of your file}
+D2P.Template = D2PTemplate #Specify the template D2P file
+D2P.Files = D2PTemplate.Files #Specify the files that will be builded {Filename => ByteArray of your file}
 D2P.Build(D2PStream)
 ```
 
@@ -55,12 +55,12 @@ A SWL file contains one and only one SWF file. This is a packaged filetype that 
 ```python
 from SWL import *
 
-SWLStream = open("./MySWLFile.swl", "rb") //Open the SWL file in binary mode
+SWLStream = open("./MySWLFile.swl", "rb") #Open the SWL file in binary mode
 SWL = SWLFile()
 try:
-    SWL.Populate(SWLStream) //Populate the SWL object with a SWL file. Must be a stream
-    SWF = SWL.SWF //SWF is a ByteArray containing the SWF file
-except SWLInvalidFile: //Raised when the SWL file is incorrect
+    SWL.Populate(SWLStream) #Populate the SWL object with a SWL file. Must be a stream
+    SWF = SWL.SWF #SWF is a ByteArray containing the SWF file
+except SWLInvalidFile: #Raised when the SWL file is incorrect
     pass
 ```
 
@@ -78,8 +78,8 @@ SWL.Populate(SWLTemplateStream)
 
 SWLStream = open("./MyCustomSWLFile.swl", "wb")
 SWL = SWLFile()
-SWL.Template = SWLTemplate //Specify the template SWL file
-SWL.SWF = SWLTemplate.SWF //Specify the SWF file that will be builded (ByteArray)
+SWL.Template = SWLTemplate #Specify the template SWL file
+SWL.SWF = SWLTemplate.SWF #Specify the SWF file that will be builded (ByteArray)
 SWL.Build(SWLStream)
 ```
 
