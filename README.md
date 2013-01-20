@@ -70,7 +70,7 @@ To build a SWL file, you have to know that SWL files contain some properties (Ve
 So, in order to build a SWL file, you have to specify the template SWL object that contains the properties.
 
 ```python
-from SWM import *
+from SWL import *
 
 SWLTemplateStream = open("./MySWLFile.swl", "rb")
 SWLTemplate = SWLFile()
