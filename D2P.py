@@ -50,7 +50,7 @@ class D2PFile:
             raise D2PInvalidFile("First bytes not found.")
 
         if BytesHeader != b"\x02\x01":
-            raise D2PInvalidFile("The first bytes doesn't match the SWL pattern.")
+            raise D2PInvalidFile("The first bytes don't match the SWL pattern.")
 
         self._Stream.seek(-24, 2) #Set position to end - 24 bytes
 
@@ -78,7 +78,7 @@ class D2PFile:
             Offset = D2PFileBinary.readInt32()
             Length = D2PFileBinary.readInt32()
             if FileName == b"" or Offset == b"" or Length == b"":
-                raise D2PInvalidFile("The file seems corrupted.")
+                raise D2PInvalidFile("The file appears to be corrupt.")
             self._FilesPosition[FileName] = {"Offset" : Offset + self._BaseOffset, "Length" : Length}
 
             i += 1
@@ -94,7 +94,7 @@ class D2PFile:
             PropertyType = (D2PFileBinary.readString()).decode()
             PropertyValue = (D2PFileBinary.readString()).decode()
             if PropertyType == b"" or PropertyValue == b"":
-                raise D2PInvalidFile("The file seems corrupted.")
+                raise D2PInvalidFile("The file appears to be corrupt.")
             self._Properties[PropertyType] = PropertyValue
 
             i += 1

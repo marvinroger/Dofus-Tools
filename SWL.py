@@ -41,13 +41,13 @@ class SWLFile:
             raise SWLInvalidFile("First byte not found.")
 
         if ByteHeader != 76:
-            raise SWLInvalidFile("The first byte doesn't match the SWL pattern.")
+            raise SWLInvalidFile("The first byte don't match the SWL pattern.")
 
         self._Version = SWLFileBinary.readChar()
         self._FrameRate = SWLFileBinary.readUInt32()
         ClassesCount = SWLFileBinary.readInt32()
         if self._Version == b"" or self._FrameRate == b"" or ClassesCount == b"":
-            raise SWLInvalidFile("The file doesn't match the SWL pattern.")
+            raise SWLInvalidFile("The file don't match the SWL pattern.")
 
         self._Classes = []
 
@@ -55,7 +55,7 @@ class SWLFile:
         while i < ClassesCount:
             Class = (SWLFileBinary.readString()).decode()
             if Class == b"":
-                raise SWLInvalidFile("The file seems corrupted.")
+                raise SWLInvalidFile("The file appears to be corrupt.")
             self._Classes.append(Class)
 
             i += 1
