@@ -1,7 +1,7 @@
 Dofus-Tools
 =========
 
-Python 3.x modules to interact with Dofus 2.x special files, like SWL/D2P.
+Python 3.x modules to interact with Dofus 2.x special files, like .SWL or .D2P.
 
 Usage
 -----
@@ -15,12 +15,12 @@ A D2P file contains the resources of the game, like audio, sprites or SWL files.
 ```python
 from D2P import *
 
-D2PStream = open("./MyD2PFile.d2p", "rb") #Open the D2P file in binary mode
+D2P_stream = open("./MyD2PFile.d2p", "rb") #Open the D2P file in binary mode
 D2P = D2PFile()
 try:
-    D2P.Populate(D2PStream) #Populate the D2P object with a D2P file. Must be a stream
-    for Name, File in D2P.Files.item():
-	pass #Do whatever you want with Name the name of the file and File a ByteArray containing the file
+    D2P.populate(D2P_stream) #Populate the D2P object with a D2P file. Must be a stream
+    for name, file_ in D2P.files.item():
+		pass #Do whatever you want with name the name of the file and file_ a ByteArray containing the file
 except D2PInvalidFile: #Raised when the D2P file is incorrect
     pass
 ```
@@ -33,15 +33,15 @@ So, in order to build a D2P file, you have to specify the template D2P object th
 ```python
 from D2P import *
 
-D2PTemplateStream = open("./MyD2PFile.d2p", "rb")
-D2PTemplate = D2PFile()
-D2P.Populate(D2PTemplateStream)
+D2P_template_stream = open("./MyD2PFile.d2p", "rb")
+D2P_template = D2PFile()
+D2P_template.populate(D2P_template_stream)
 
-D2PStream = open("./MyCustomD2PFile.d2p", "wb")
+D2P_stream = open("./MyCustomD2PFile.d2p", "wb")
 D2P = D2PFile()
-D2P.Template = D2PTemplate #Specify the template D2P file
-D2P.Files = D2PTemplate.Files #Specify the files that will be builded {Filename => ByteArray of your file}
-D2P.Build(D2PStream)
+D2P.template = D2P_template #Specify the template D2P file
+D2P.files = D2P_template.files #Specify the files that will be builded {Filename => ByteArray of your file}
+D2P.build(D2P_stream)
 ```
 
 The above exemple build the same file as the template as it build the same files. D2P builded file will be exactly the same as the original file. (Checksums are same)
@@ -55,10 +55,10 @@ A SWL file contains one and only one SWF file. This is a packaged filetype that 
 ```python
 from SWL import *
 
-SWLStream = open("./MySWLFile.swl", "rb") #Open the SWL file in binary mode
+SWL_stream = open("./MySWLFile.swl", "rb") #Open the SWL file in binary mode
 SWL = SWLFile()
 try:
-    SWL.Populate(SWLStream) #Populate the SWL object with a SWL file. Must be a stream
+    SWL.populate(SWL_stream) #Populate the SWL object with a SWL file. Must be a stream
     SWF = SWL.SWF #SWF is a ByteArray containing the SWF file
 except SWLInvalidFile: #Raised when the SWL file is incorrect
     pass
@@ -72,15 +72,15 @@ So, in order to build a SWL file, you have to specify the template SWL object th
 ```python
 from SWL import *
 
-SWLTemplateStream = open("./MySWLFile.swl", "rb")
-SWLTemplate = SWLFile()
-SWL.Populate(SWLTemplateStream)
+SWL_template_stream = open("./MySWLFile.swl", "rb")
+SWL_template = SWLFile()
+SWL_template.populate(SWL_template_stream)
 
-SWLStream = open("./MyCustomSWLFile.swl", "wb")
+SWL_stream = open("./MyCustomSWLFile.swl", "wb")
 SWL = SWLFile()
-SWL.Template = SWLTemplate #Specify the template SWL file
-SWL.SWF = SWLTemplate.SWF #Specify the SWF file that will be builded (ByteArray)
-SWL.Build(SWLStream)
+SWL.template = SWL_template #Specify the template SWL file
+SWL.SWF = SWL_template.SWF #Specify the SWF file that will be builded (ByteArray)
+SWL.build(SWL_stream)
 ```
 
 The above exemple build the same file as the template as it build the same SWF file. SWL builded file will be exactly the same as the original file. (Checksums are same)

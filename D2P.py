@@ -20,194 +20,190 @@ class D2PInvalidFile(Exception):
 class D2PFile:
 
     def __init__(self):
-        self._Stream = None
+        self._stream = None
 
-        self._BaseOffset = None
-        self._BaseLength = None
-        self._IndexesOffset = None
-        self._NumberIndexes = None
-        self._PropertiesOffset = None
-        self._NumberProperties = None
+        self._base_offset = None
+        self._base_length = None
+        self._indexes_offset = None
+        self._number_indexes = None
+        self._properties_offset = None
+        self._number_properties = None
 
-        self._Properties = None
+        self._properties = None
 
-        self._FilesPosition = None
+        self._files_position = None
 
-        self._Files = None
+        self._files = None
 
-        self._Template = None
+        self._template = None
 
-    def Populate(self, stream):
+    def populate(self, stream):
         """
         Populate the class with the D2P stream given
         """
-        self._Stream = stream
+        self._stream = stream
 
-        D2PFileBinary = BinaryStream(self._Stream, True)
+        D2P_file_binary = BinaryStream(self._stream, True)
 
-        BytesHeader = D2PFileBinary.readBytes(2)
-        if BytesHeader == b"":
+        bytes_header = D2P_file_binary.read_bytes(2)
+        if bytes_header == b"":
             raise D2PInvalidFile("First bytes not found.")
 
-        if BytesHeader != b"\x02\x01":
+        if bytes_header != b"\x02\x01":
             raise D2PInvalidFile("The first bytes don't match the SWL pattern.")
 
-        self._Stream.seek(-24, 2) #Set position to end - 24 bytes
+        self._stream.seek(-24, 2) #Set position to end - 24 bytes
 
-        self._BaseOffset = D2PFileBinary.readUInt32()
-        self._BaseLength = D2PFileBinary.readUInt32()
-        self._IndexesOffset = D2PFileBinary.readUInt32()
-        self._NumberIndexes = D2PFileBinary.readUInt32()
-        self._PropertiesOffset = D2PFileBinary.readUInt32()
-        self._NumberProperties = D2PFileBinary.readUInt32()
+        self._base_offset = D2P_file_binary.read_uint32()
+        self._base_length = D2P_file_binary.read_uint32()
+        self._indexes_offset = D2P_file_binary.read_uint32()
+        self._number_indexes = D2P_file_binary.read_uint32()
+        self._properties_offset = D2P_file_binary.read_uint32()
+        self._number_properties = D2P_file_binary.read_uint32()
 
 
-        if self._BaseOffset == b"" or self._BaseLength == b"" or self._IndexesOffset == b"" or self._NumberIndexes == b"" or self._PropertiesOffset == b"" or self._NumberProperties == b"":
+        if self._base_offset == b"" or self._base_length == b"" or self._indexes_offset == b"" or self._number_indexes == b"" or self._properties_offset == b"" or self._number_properties == b"":
             raise D2PInvalidFile("The file doesn't match the D2P pattern.")
 
 
-        self._Stream.seek(self._IndexesOffset, 0)
+        self._stream.seek(self._indexes_offset, 0)
 
         #Read indexes
 
-        self._FilesPosition = OrderedDict()
+        self._files_position = OrderedDict()
 
         i = 0
-        while i < self._NumberIndexes:
-            FileName = (D2PFileBinary.readString()).decode()
-            Offset = D2PFileBinary.readInt32()
-            Length = D2PFileBinary.readInt32()
-            if FileName == b"" or Offset == b"" or Length == b"":
+        while i < self._number_indexes:
+            file_name = (D2P_file_binary.read_string()).decode()
+            offset = D2P_file_binary.read_int32()
+            length = D2P_file_binary.read_int32()
+            if file_name == b"" or offset == b"" or length == b"":
                 raise D2PInvalidFile("The file appears to be corrupt.")
-            self._FilesPosition[FileName] = {"Offset" : Offset + self._BaseOffset, "Length" : Length}
+            self._files_position[file_name] = {"offset" : offset + self._base_offset, "length" : length}
 
             i += 1
 
-        self._Stream.seek(self._PropertiesOffset, 0)
+        self._stream.seek(self._properties_offset, 0)
 
         #Read properties
 
-        self._Properties = OrderedDict()
+        self._properties = OrderedDict()
 
         i = 0
-        while i < self._NumberProperties:
-            PropertyType = (D2PFileBinary.readString()).decode()
-            PropertyValue = (D2PFileBinary.readString()).decode()
-            if PropertyType == b"" or PropertyValue == b"":
+        while i < self._number_properties:
+            property_type = (D2P_file_binary.read_string()).decode()
+            property_value = (D2P_file_binary.read_string()).decode()
+            if property_type == b"" or property_value == b"":
                 raise D2PInvalidFile("The file appears to be corrupt.")
-            self._Properties[PropertyType] = PropertyValue
+            self._properties[property_type] = property_value
 
             i += 1
 
         #Populate _Files
 
-        self._Files = OrderedDict()
+        self._files = OrderedDict()
 
-        for FileName, Position in self._FilesPosition.items():
-            self._Stream.seek(Position["Offset"], 0)
+        for file_name, position in self._files_position.items():
+            self._stream.seek(position["offset"], 0)
 
-            self._Files[FileName] = D2PFileBinary.readBytes(Position["Length"])
+            self._files[file_name] = D2P_file_binary.read_bytes(Position["length"])
 
 
 
-    def Build(self, stream):
+    def build(self, stream):
         """
         Create the D2P represented by the class in the given stream.
         """
-        if self._Template is None:
+        if self._template is None:
             raise RuntimeError("Template must be defined to build a D2P file")
 
-        D2PFileBuildBinary = BinaryStream(stream, True)
+        D2P_file_build_binary = BinaryStream(stream, True)
 
-        D2PFileBuildBinary.writeBytes(b"\x02\x01")
+        D2P_file_build_binary.writeBytes(b"\x02\x01")
 
-        self._BaseOffset = stream.tell()
+        self._base_offset = stream.tell()
 
-        for FileName, File in self._Files.items():
-            D2PFileBuildBinary.writeBytes(File)
+        for file_name, file_ in self._files.items():
+            D2P_file_build_binary.write_bytes(file_)
 
-        self._BaseLength = stream.tell() - self._BaseOffset
+        self._base_length = stream.tell() - self._base_offset
 
-        self._IndexesOffset = stream.tell()
-        self._NumberIndexes = 0
+        self._indexes_offset = stream.tell()
+        self._number_indexes = 0
 
-        print(self._FilesPosition.items())
+        for file_name, position in self._files_position.items():
+            D2P_file_build_binary.write_string(file_name.encode())
+            D2P_file_build_binary.write_int32(position["offset"])
+            D2P_file_build_binary.write_int32(position["length"])
+            self._number_indexes += 1
 
-        input()
+        self._properties_offset = stream.tell()
+        self._number_properties = 0
 
-        for FileName, Position in self._FilesPosition.items():
-            D2PFileBuildBinary.writeString(FileName.encode())
-            D2PFileBuildBinary.writeInt32(Position["Offset"])
-            D2PFileBuildBinary.writeInt32(Position["Length"])
-            self._NumberIndexes += 1
+        for property_type, property_value in self._template._properties.items():
+            D2P_file_build_binary.write_string(property_type.encode())
+            D2P_file_build_binary.write_string(property_value.encode())
+            self._number_properties += 1
 
-        self._PropertiesOffset = stream.tell()
-        self._NumberProperties = 0
-
-        for PropertyType, PropertyValue in self._Template._Properties.items():
-            D2PFileBuildBinary.writeString(PropertyType.encode())
-            D2PFileBuildBinary.writeString(PropertyValue.encode())
-            self._NumberProperties += 1
-
-        D2PFileBuildBinary.writeUInt32(self._BaseOffset)
-        D2PFileBuildBinary.writeUInt32(self._BaseLength)
-        D2PFileBuildBinary.writeUInt32(self._IndexesOffset)
-        D2PFileBuildBinary.writeUInt32(self._NumberIndexes)
-        D2PFileBuildBinary.writeUInt32(self._PropertiesOffset)
-        D2PFileBuildBinary.writeUInt32(self._NumberProperties)
+        D2P_file_build_binary.write_uint32(self._base_offset)
+        D2P_file_build_binary.write_uint32(self._base_length)
+        D2P_file_build_binary.write_uint32(self._indexes_offset)
+        D2P_file_build_binary.write_uint32(self._number_indexes)
+        D2P_file_build_binary.write_uint32(self._properties_offset)
+        D2P_file_build_binary.write_uint32(self._number_properties)
 
     #Accessors
 
-    def _Get_Stream(self):
-        return self._Stream
+    def _get_stream(self):
+        return self._stream
 
-    def _Get_Properties(self):
-        return self._Properties
+    def _get_properties(self):
+        return self._properties
 
-    def _Get_FilesPosition(self):
-        return self._FilesPosition
+    def _get_files_position(self):
+        return self._files_position
 
-    def _Get_Files(self):
-        return self._Files
+    def _get_files(self):
+        return self._files
 
-    def _Get_Template(self):
-        return self._Template
+    def _get_template(self):
+        return self._template
 
     #Mutators
 
-    def _Set_Properties(self, properties):
+    def _set_properties(self, properties):
         if isinstance(properties, OrderedDict):
-            self._Properties = properties
+            self._properties = properties
         else:
             raise TypeError("Properties must be a dictionnary of byte object. (Property => Value)")
 
-    def _Set_Files(self, files):
+    def _set_files(self, files):
         if isinstance(files, OrderedDict):
-            self._Files = files
-            self._FilesPosition = OrderedDict()
+            self._files = files
+            self._files_position = OrderedDict()
 
             #Update positions
-            ActualOffset = 0
+            actual_offset = 0
 
-            for FileName, File in self._Files.items():
-                self._FilesPosition[FileName] = {"Offset" : ActualOffset, "Length" : len(File)}
-                ActualOffset += self._FilesPosition[FileName]["Length"]
+            for file_name, file_ in self._files.items():
+                self._files_position[file_name] = {"offset" : actual_offset, "length" : len(file_)}
+                actual_offset += self._files_position[file_name]["length"]
         else:
             raise TypeError("Files must be a dictionnary of byte object. (FileName => Bytes)")
 
-    def _Set_Template(self, template):
+    def _set_template(self, template):
         if isinstance(template, D2PFile):
-            self._Template = template
+            self._template = template
         else:
             raise TypeError("Template must be an instance of the D2PFile class.")
 
     #Properties
 
-    Stream = property(_Get_Stream)
-    Properties = property(_Get_Properties, _Set_Properties)
-    FilesPosition = property(_Get_FilesPosition)
-    Files = property(_Get_Files, _Set_Files)
-    Template = property(_Get_Template, _Set_Template)
+    stream = property(_get_stream)
+    properties = property(_get_properties, _set_properties)
+    files_position = property(_get_files_position)
+    files = property(_get_Files, _set_files)
+    template = property(_get_template, _set_template)
 
 if __name__ == "__main__":
     input()

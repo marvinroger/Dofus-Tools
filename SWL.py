@@ -18,112 +18,112 @@ class SWLInvalidFile(Exception):
 class SWLFile:
 
     def __init__(self):
-        self._Stream = None
-        self._Version = None
-        self._FrameRate = None
+        self._stream = None
+        self._version = None
+        self._frame_rate = None
 
-        self._Classes = None
+        self._classes = None
 
         self._SWF = None
 
-        self._Template = None
+        self._template = None
 
-    def Populate(self, stream):
+    def populate(self, stream):
         """
         Populate the class with the SWL stream given
         """
-        self._Stream = stream
+        self._stream = stream
 
-        SWLFileBinary = BinaryStream(self._Stream, True)
+        SWL_file_binary = BinaryStream(self._stream, True)
 
-        ByteHeader = SWLFileBinary.readChar()
-        if ByteHeader == b"":
+        byte_header = SWL_file_binary.read_char()
+        if byte_header == b"":
             raise SWLInvalidFile("First byte not found.")
 
-        if ByteHeader != 76:
+        if byte_header != 76:
             raise SWLInvalidFile("The first byte don't match the SWL pattern.")
 
-        self._Version = SWLFileBinary.readChar()
-        self._FrameRate = SWLFileBinary.readUInt32()
-        ClassesCount = SWLFileBinary.readInt32()
-        if self._Version == b"" or self._FrameRate == b"" or ClassesCount == b"":
+        self._version = SWL_file_binary.read_char()
+        self._frame_rate = SWL_file_binary.read_uint32()
+        classes_count = SWL_file_binary.read_int32()
+        if self._version == b"" or self._frame_rate == b"" or classes_count == b"":
             raise SWLInvalidFile("The file don't match the SWL pattern.")
 
-        self._Classes = []
+        self._classes = []
 
         i = 0
-        while i < ClassesCount:
-            Class = (SWLFileBinary.readString()).decode()
-            if Class == b"":
+        while i < classes_count:
+            class_ = (SWL_file_binary.read_string()).decode()
+            if class_ == b"":
                 raise SWLInvalidFile("The file appears to be corrupt.")
-            self._Classes.append(Class)
+            self._classes.append(class_)
 
             i += 1
 
-        self._SWF = SWLFileBinary.readBytes()
+        self._SWF = SWL_file_binary.read_bytes()
 
-    def Build(self, stream):
+    def build(self, stream):
         """
         Create the SWL represented by the class in the given stream.
         """
-        if self._Template is None:
+        if self._template is None:
             raise RuntimeError("Template must be defined to build a SWL file")
 
-        SWLFileBuildBinary = BinaryStream(stream, True)
+        SWL_file_build_binary = BinaryStream(stream, True)
 
-        SWLFileBuildBinary.writeChar(76)
+        SWL_file_build_binary.write_char(76)
 
-        SWLFileBuildBinary.writeChar(self._Template.Version)
-        SWLFileBuildBinary.writeUInt32(self._Template.FrameRate)
-        SWLFileBuildBinary.writeInt32(len(self._Template.Classes))
+        SWL_file_build_binary.write_char(self._template.version)
+        SWL_file_build_binary.write_uint32(self._template.frame_rate)
+        SWL_file_build_binary.write_int32(len(self._template.classes))
 
-        for Class in self._Template.Classes:
-            SWLFileBuildBinary.writeString((Class).encode())
+        for class_ in self._template.classes:
+            SWL_file_build_binary.write_string((class_).encode())
 
-        SWLFileBuildBinary.writeBytes(self._SWF)
+        SWL_file_build_binary.write_bytes(self._SWF)
 
     #Accessors
 
-    def _Get_Stream(self):
-        return self._Stream
+    def _get_stream(self):
+        return self._stream
 
-    def _Get_Version(self):
-        return self._Version
+    def _get_version(self):
+        return self._version
 
-    def _Get_FrameRate(self):
-        return self._FrameRate
+    def _get_frameRate(self):
+        return self._frame_rate
 
-    def _Get_Classes(self):
-        return self._Classes
+    def _get_classes(self):
+        return self._classes
 
-    def _Get_SWF(self):
+    def _get_SWF(self):
         return self._SWF
 
-    def _Get_Template(self):
-        return self._Template
+    def _get_template(self):
+        return self._template
 
     #Mutators
 
-    def _Set_SWF(self, swf):
+    def _set_SWF(self, swf):
         if isinstance(swf, bytes):
             self._SWF = swf
         else:
             raise TypeError("SWF must be a byte object.")
 
-    def _Set_Template(self, template):
+    def _set_template(self, template):
         if isinstance(template, SWLFile):
-            self._Template = template
+            self._template = template
         else:
             raise TypeError("Template must be an instance of the SWLFile class.")
 
     #Properties
 
-    Stream = property(_Get_Stream)
-    Version = property(_Get_Version)
-    FrameRate = property(_Get_FrameRate)
-    Classes = property(_Get_Classes)
-    SWF = property(_Get_SWF, _Set_SWF)
-    Template = property(_Get_Template, _Set_Template)
+    stream = property(_get_stream)
+    version = property(_het_version)
+    frame_rate = property(_get_frame_rate)
+    classes = property(_get_classes)
+    SWF = property(_get_SWF, _set_SWF)
+    template = property(_get_template, _set_template)
 
 if __name__ == "__main__":
     input()
