@@ -90,7 +90,7 @@ class SWLFile:
     def _get_version(self):
         return self._version
 
-    def _get_frameRate(self):
+    def _get_frame_rate(self):
         return self._frame_rate
 
     def _get_classes(self):
@@ -119,11 +119,20 @@ class SWLFile:
     #Properties
 
     stream = property(_get_stream)
-    version = property(_het_version)
+    version = property(_get_version)
     frame_rate = property(_get_frame_rate)
     classes = property(_get_classes)
     SWF = property(_get_SWF, _set_SWF)
     template = property(_get_template, _set_template)
 
 if __name__ == "__main__":
+    SWL_template_stream = open("./sample.swl", "rb")
+    SWL_template = SWLFile()
+    SWL_template.populate(SWL_template_stream)
+
+    SWL_stream = open("./sample_compiled.swl", "wb")
+    SWL = SWLFile()
+    SWL.template = SWL_template #Specify the template SWL file
+    SWL.SWF = SWL_template.SWF #Specify the SWF file that will be builded (ByteArray)
+    SWL.build(SWL_stream)
     input()

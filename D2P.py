@@ -106,7 +106,7 @@ class D2PFile:
         for file_name, position in self._files_position.items():
             self._stream.seek(position["offset"], 0)
 
-            self._files[file_name] = D2P_file_binary.read_bytes(Position["length"])
+            self._files[file_name] = D2P_file_binary.read_bytes(position["length"])
 
 
 
@@ -119,7 +119,7 @@ class D2PFile:
 
         D2P_file_build_binary = BinaryStream(stream, True)
 
-        D2P_file_build_binary.writeBytes(b"\x02\x01")
+        D2P_file_build_binary.write_bytes(b"\x02\x01")
 
         self._base_offset = stream.tell()
 
@@ -202,8 +202,17 @@ class D2PFile:
     stream = property(_get_stream)
     properties = property(_get_properties, _set_properties)
     files_position = property(_get_files_position)
-    files = property(_get_Files, _set_files)
+    files = property(_get_files, _set_files)
     template = property(_get_template, _set_template)
 
 if __name__ == "__main__":
+    D2P_template_stream = open("./sample.d2p", "rb")
+    D2P_template = D2PFile()
+    D2P_template.populate(D2P_template_stream)
+
+    D2P_stream = open("./sample_compiled.d2p", "wb")
+    D2P = D2PFile()
+    D2P.template = D2P_template #Specify the template D2P file
+    D2P.files = D2P_template.files #Specify the files that will be builded {Filename => ByteArray of your file}
+    D2P.build(D2P_stream)
     input()

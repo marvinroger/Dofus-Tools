@@ -15,7 +15,7 @@ A D2P file contains the resources of the game, like audio, sprites or SWL files.
 ```python
 from D2P import *
 
-D2P_stream = open("./MyD2PFile.d2p", "rb") #Open the D2P file in binary mode
+D2P_stream = open("./sample.d2p", "rb") #Open the D2P file in binary mode
 D2P = D2PFile()
 try:
     D2P.populate(D2P_stream) #Populate the D2P object with a D2P file. Must be a stream
@@ -33,11 +33,11 @@ So, in order to build a D2P file, you have to specify the template D2P object th
 ```python
 from D2P import *
 
-D2P_template_stream = open("./MyD2PFile.d2p", "rb")
+D2P_template_stream = open("./sample.d2p", "rb")
 D2P_template = D2PFile()
 D2P_template.populate(D2P_template_stream)
 
-D2P_stream = open("./MyCustomD2PFile.d2p", "wb")
+D2P_stream = open("./sample_compiled.d2p", "wb")
 D2P = D2PFile()
 D2P.template = D2P_template #Specify the template D2P file
 D2P.files = D2P_template.files #Specify the files that will be builded {Filename => ByteArray of your file}
@@ -55,7 +55,7 @@ A SWL file contains one and only one SWF file. This is a packaged filetype that 
 ```python
 from SWL import *
 
-SWL_stream = open("./MySWLFile.swl", "rb") #Open the SWL file in binary mode
+SWL_stream = open("./sample.swl", "rb") #Open the SWL file in binary mode
 SWL = SWLFile()
 try:
     SWL.populate(SWL_stream) #Populate the SWL object with a SWL file. Must be a stream
@@ -72,11 +72,11 @@ So, in order to build a SWL file, you have to specify the template SWL object th
 ```python
 from SWL import *
 
-SWL_template_stream = open("./MySWLFile.swl", "rb")
+SWL_template_stream = open("./sample.swl", "rb")
 SWL_template = SWLFile()
 SWL_template.populate(SWL_template_stream)
 
-SWL_stream = open("./MyCustomSWLFile.swl", "wb")
+SWL_stream = open("./sample_compiled.swl", "wb")
 SWL = SWLFile()
 SWL.template = SWL_template #Specify the template SWL file
 SWL.SWF = SWL_template.SWF #Specify the SWF file that will be builded (ByteArray)
