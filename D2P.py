@@ -37,10 +37,10 @@ class D2PFile:
 
         self._template = None
 
-    def populate(self, stream):
-        """
-        Populate the class with the D2P stream given
-        """
+        self._initialized = False
+        self._populated = False
+
+    def init(self, stream, populate = False):
         self._stream = stream
 
         D2P_file_binary = BinaryStream(self._stream, True)
@@ -99,7 +99,22 @@ class D2PFile:
 
             i += 1
 
+        self._initialized = True
+
+        if populate:
+            self.populate()
+
+    def populate(self):
+        """
+        Populate the class with the actual D2P files in
+        """
         #Populate _Files
+
+        if self._initialized = False:
+            raise Exception("D2P instance not initialized.")
+
+        if self._populated:
+            raise Exception("D2P instance is already populated.")
 
         self._files = OrderedDict()
 
@@ -107,6 +122,8 @@ class D2PFile:
             self._stream.seek(position["offset"], 0)
 
             self._files[file_name] = D2P_file_binary.read_bytes(position["length"])
+
+        self._populated = True
 
 
 
