@@ -1,10 +1,7 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
-if __name__ == "__main__":
-    from BinaryStream import *
-else:
-    from .BinaryStream import *
+from BinaryStream import *
 
 #Exceptions
 

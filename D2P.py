@@ -1,10 +1,7 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
-if __name__ == "__main__":
-    from BinaryStream import *
-else:
-    from .BinaryStream import *
+from BinaryStream import *
 
 from collections import OrderedDict
 
@@ -110,11 +107,13 @@ class D2PFile:
         """
         #Populate _Files
 
-        if self._initialized = False:
+        if self._initialized == False:
             raise Exception("D2P instance not initialized.")
 
         if self._populated:
             raise Exception("D2P instance is already populated.")
+
+        D2P_file_binary = BinaryStream(self._stream, True)
 
         self._files = OrderedDict()
 

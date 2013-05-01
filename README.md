@@ -20,7 +20,7 @@ D2P = D2PFile()
 try:
 	D2P.init(D2P_stream) #Init the D2P object with a D2P file. Must be a stream (Init = get D2P informations)
     D2P.populate() #Populate the D2P object with the above given D2P stream. (Populate = load files in the D2P in RAM)
-    for name, file_ in D2P.files.item():
+    for name, file_ in D2P.files.items():
 		pass #Do whatever you want with name the name of the file and file_ a ByteArray containing the file
 except D2PInvalidFile: #Raised when the D2P file is incorrect
     pass
