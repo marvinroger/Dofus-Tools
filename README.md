@@ -1,5 +1,6 @@
-Dofus-Tools
-=========
+Dofus-Tools [![Build Status](https://travis-ci.org/GiddyDown/Dofus-Tools.png)](https://travis-ci.org/GiddyDown/Dofus-Tools)
+
+===========
 
 Python 3.x modules to interact with Dofus 2.x special files, like .SWL or .D2P.
 
