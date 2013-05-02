@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
-from BinaryStream import *
+from binarystream import *
 
 from collections import OrderedDict
 
@@ -35,9 +35,12 @@ class D2PFile:
         self._template = None
 
         self._initialized = False
-        self._populated = False
+        self._loaded = False
 
-    def init(self, stream, populate = False):
+    def init(self, stream, autoload = True):
+        """
+        Init the class with the informations about files in the D2P
+        """
         self._stream = stream
 
         D2P_file_binary = BinaryStream(self._stream, True)
@@ -98,19 +101,19 @@ class D2PFile:
 
         self._initialized = True
 
-        if populate:
-            self.populate()
+        if autoload:
+            self.load()
 
-    def populate(self):
+    def load(self):
         """
-        Populate the class with the actual D2P files in
+        Load the class with the actual D2P files in
         """
         #Populate _Files
 
         if self._initialized == False:
             raise Exception("D2P instance not initialized.")
 
-        if self._populated:
+        if self._loaded:
             raise Exception("D2P instance is already populated.")
 
         D2P_file_binary = BinaryStream(self._stream, True)
@@ -122,7 +125,7 @@ class D2PFile:
 
             self._files[file_name] = D2P_file_binary.read_bytes(position["length"])
 
-        self._populated = True
+        self._loaded = True
 
 
 
@@ -185,6 +188,12 @@ class D2PFile:
     def _get_template(self):
         return self._template
 
+    def _get_initialized(self):
+        return self._initialized
+
+    def _get_loaded(self):
+        return self._loaded
+
     #Mutators
 
     def _set_properties(self, properties):
@@ -220,6 +229,8 @@ class D2PFile:
     files_position = property(_get_files_position)
     files = property(_get_files, _set_files)
     template = property(_get_template, _set_template)
+    initialized = property(_get_initialized)
+    loaded = property(_get_loaded)
 
 if __name__ == "__main__":
     D2P_template_stream = open("./sample.d2p", "rb")

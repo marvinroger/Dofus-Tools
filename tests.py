@@ -1,5 +1,9 @@
+#!/usr/bin/python3
+# -*- coding: utf-8 -*-
+
 import unittest
 import hashlib
+import os
 from D2P import *
 from SWL import *
 
@@ -7,22 +11,25 @@ class Test(unittest.TestCase):
     def setUp(self):
         pass
 
+    def tearDown(self):
+        pass
+
     def test_decompile_good_swl(self):
         SWL_stream = open("./samples/sample.swl", "rb")
         SWL = SWLFile()
-        SWL.populate(SWL_stream)
+        SWL.init(SWL_stream)
         SWL_stream.close()
 
     def test_decompile_bad_swl(self):
         SWL_stream = open("./samples/bad.swl", "rb")
         SWL = SWLFile()
-        self.assertRaises(SWLInvalidFile, SWL.populate, SWL_stream)
+        self.assertRaises(SWLInvalidFile, SWL.init, SWL_stream)
         SWL_stream.close()
 
     def test_build_swl(self):
         SWL_template_stream = open("./samples/sample.swl", "rb")
         SWL_template = SWLFile()
-        SWL_template.populate(SWL_template_stream)
+        SWL_template.init(SWL_template_stream)
 
         SWL_stream = open("./sample_compiled.swl", "wb")
         SWL = SWLFile()
@@ -41,28 +48,32 @@ class Test(unittest.TestCase):
         buildedf = open("./sample_compiled.swl", 'rb')
         builded = hashlib.md5(buildedf.read()).digest()
         buildedf.close()
+        try:
+            os.remove("./sample_compiled.swl")
+        except OSError:
+            pass
 
         self.assertEqual(original, builded)
 
     def test_decompile_good_d2p(self):
         D2P_stream = open("./samples/sample.d2p", "rb")
         D2P = D2PFile()
-        D2P.init(D2P_stream)
-        D2P.populate()
+        D2P.init(D2P_stream, False)
+        D2P.load()
         D2P_stream.close()
 
     def test_decompile_bad_d2p(self):
         D2P_stream = open("./samples/bad.d2p", "rb")
         D2P = D2PFile()
-        self.assertRaises(D2PInvalidFile, D2P.init, D2P_stream)
-        self.assertRaises(Exception, D2P.populate)
+        self.assertRaises(D2PInvalidFile, D2P.init, D2P_stream, False)
+        self.assertRaises(Exception, D2P.load)
         D2P_stream.close()
 
 
     def test_build_d2p(self):
         D2P_template_stream = open("./samples/sample.d2p", "rb")
         D2P_template = D2PFile()
-        D2P_template.init(D2P_template_stream, True) 
+        D2P_template.init(D2P_template_stream) 
 
         D2P_stream = open("./sample_compiled.d2p", "wb")
         D2P = D2PFile()
@@ -81,6 +92,10 @@ class Test(unittest.TestCase):
         buildedf = open("./sample_compiled.d2p", 'rb')
         builded = hashlib.md5(buildedf.read()).digest()
         buildedf.close()
+        try:
+            os.remove("./sample_compiled.d2p")
+        except OSError:
+            pass
 
         self.assertEqual(original, builded)
 

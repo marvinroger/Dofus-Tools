@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
-from BinaryStream import *
+from binarystream import *
 
 #Exceptions
 
@@ -25,9 +25,9 @@ class SWLFile:
 
         self._template = None
 
-    def populate(self, stream):
+    def init(self, stream):
         """
-        Populate the class with the SWL stream given
+        Load the class with the SWL stream given
         """
         self._stream = stream
 
@@ -125,7 +125,7 @@ class SWLFile:
 if __name__ == "__main__":
     SWL_template_stream = open("./sample.swl", "rb")
     SWL_template = SWLFile()
-    SWL_template.populate(SWL_template_stream)
+    SWL_template.load(SWL_template_stream)
 
     SWL_stream = open("./sample_compiled.swl", "wb")
     SWL = SWLFile()
