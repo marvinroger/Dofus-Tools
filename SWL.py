@@ -3,17 +3,19 @@
 
 from binarystream import *
 
-#Exceptions
+# Exceptions
+
 
 class SWLInvalidFile(Exception):
     def __init__(self, message):
         super(SWLInvalidFile, self).__init__(message)
         self.message = message
 
-#Class itself
+# Class itself
+
 
 class SWLFile:
-
+    """Deal with SWL files"""
     def __init__(self):
         self._stream = None
         self._version = None
@@ -26,9 +28,7 @@ class SWLFile:
         self._template = None
 
     def init(self, stream):
-        """
-        Load the class with the SWL stream given
-        """
+        """Load the class with the SWL stream given"""
         self._stream = stream
 
         SWL_file_binary = BinaryStream(self._stream, True)
@@ -43,7 +43,8 @@ class SWLFile:
         self._version = SWL_file_binary.read_char()
         self._frame_rate = SWL_file_binary.read_uint32()
         classes_count = SWL_file_binary.read_int32()
-        if self._version == b"" or self._frame_rate == b"" or classes_count == b"":
+        if ((self._version == b"" or self._frame_rate == b"" or
+             classes_count == b"")):
             raise SWLInvalidFile("The file don't match the SWL pattern.")
 
         self._classes = []
@@ -60,9 +61,7 @@ class SWLFile:
         self._SWF = SWL_file_binary.read_bytes()
 
     def build(self, stream):
-        """
-        Create the SWL represented by the class in the given stream.
-        """
+        """Create the SWL represented by the class in the given stream."""
         if self._template is None:
             raise RuntimeError("Template must be defined to build a SWL file")
 
@@ -79,7 +78,7 @@ class SWLFile:
 
         SWL_file_build_binary.write_bytes(self._SWF)
 
-    #Accessors
+    # Accessors
 
     def _get_stream(self):
         return self._stream
@@ -99,7 +98,7 @@ class SWLFile:
     def _get_template(self):
         return self._template
 
-    #Mutators
+    # Mutators
 
     def _set_SWF(self, swf):
         if isinstance(swf, bytes):
@@ -111,9 +110,10 @@ class SWLFile:
         if isinstance(template, SWLFile):
             self._template = template
         else:
-            raise TypeError("Template must be an instance of the SWLFile class.")
+            raise TypeError("Template must be an instance of the"
+                            " SWLFile class.")
 
-    #Properties
+    # Properties
 
     stream = property(_get_stream)
     version = property(_get_version)
@@ -121,15 +121,3 @@ class SWLFile:
     classes = property(_get_classes)
     SWF = property(_get_SWF, _set_SWF)
     template = property(_get_template, _set_template)
-
-if __name__ == "__main__":
-    SWL_template_stream = open("./sample.swl", "rb")
-    SWL_template = SWLFile()
-    SWL_template.load(SWL_template_stream)
-
-    SWL_stream = open("./sample_compiled.swl", "wb")
-    SWL = SWLFile()
-    SWL.template = SWL_template #Specify the template SWL file
-    SWL.SWF = SWL_template.SWF #Specify the SWF file that will be builded (ByteArray)
-    SWL.build(SWL_stream)
-    input()

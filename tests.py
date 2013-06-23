@@ -7,6 +7,7 @@ import os
 from D2P import *
 from SWL import *
 
+
 class Test(unittest.TestCase):
     def setUp(self):
         pass
@@ -69,11 +70,10 @@ class Test(unittest.TestCase):
         self.assertRaises(Exception, D2P.load)
         D2P_stream.close()
 
-
     def test_build_d2p(self):
         D2P_template_stream = open("./samples/sample.d2p", "rb")
         D2P_template = D2PFile()
-        D2P_template.init(D2P_template_stream) 
+        D2P_template.init(D2P_template_stream)
 
         D2P_stream = open("./sample_compiled.d2p", "wb")
         D2P = D2PFile()

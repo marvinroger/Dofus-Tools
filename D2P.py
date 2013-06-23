@@ -5,17 +5,19 @@ from binarystream import *
 
 from collections import OrderedDict
 
-#Exceptions
+# Exceptions
+
 
 class D2PInvalidFile(Exception):
     def __init__(self, message):
         super(D2PInvalidFile, self).__init__(message)
         self.message = message
 
-#Class itself
+# Class itself
+
 
 class D2PFile:
-
+    """Deal with D2P files"""
     def __init__(self):
         self._stream = None
 
@@ -37,10 +39,8 @@ class D2PFile:
         self._initialized = False
         self._loaded = False
 
-    def init(self, stream, autoload = True):
-        """
-        Init the class with the informations about files in the D2P
-        """
+    def init(self, stream, autoload=True):
+        """Init the class with the informations about files in the D2P"""
         self._stream = stream
 
         D2P_file_binary = BinaryStream(self._stream, True)
@@ -50,9 +50,10 @@ class D2PFile:
             raise D2PInvalidFile("First bytes not found.")
 
         if bytes_header != b"\x02\x01":
-            raise D2PInvalidFile("The first bytes don't match the SWL pattern.")
+            raise D2PInvalidFile("The first bytes don't match the"
+                                 " SWL pattern.")
 
-        self._stream.seek(-24, 2) #Set position to end - 24 bytes
+        self._stream.seek(-24, 2)  # Set position to end - 24 bytes
 
         self._base_offset = D2P_file_binary.read_uint32()
         self._base_length = D2P_file_binary.read_uint32()
@@ -61,14 +62,15 @@ class D2PFile:
         self._properties_offset = D2P_file_binary.read_uint32()
         self._number_properties = D2P_file_binary.read_uint32()
 
-
-        if self._base_offset == b"" or self._base_length == b"" or self._indexes_offset == b"" or self._number_indexes == b"" or self._properties_offset == b"" or self._number_properties == b"":
+        if ((self._base_offset == b"" or self._base_length == b"" or
+             self._indexes_offset == b"" or self._number_indexes == b"" or
+             self._properties_offset == b"" or
+             self._number_properties == b"")):
             raise D2PInvalidFile("The file doesn't match the D2P pattern.")
-
 
         self._stream.seek(self._indexes_offset, 0)
 
-        #Read indexes
+        # Read indexes
 
         self._files_position = OrderedDict()
 
@@ -79,13 +81,16 @@ class D2PFile:
             length = D2P_file_binary.read_int32()
             if file_name == b"" or offset == b"" or length == b"":
                 raise D2PInvalidFile("The file appears to be corrupt.")
-            self._files_position[file_name] = {"offset" : offset + self._base_offset, "length" : length}
+            self._files_position[file_name] = {
+                "offset": offset + self._base_offset,
+                "length": length
+            }
 
             i += 1
 
         self._stream.seek(self._properties_offset, 0)
 
-        #Read properties
+        # Read properties
 
         self._properties = OrderedDict()
 
@@ -105,12 +110,10 @@ class D2PFile:
             self.load()
 
     def load(self):
-        """
-        Load the class with the actual D2P files in
-        """
-        #Populate _Files
+        """Load the class with the actual D2P files in it"""
+        # Populate _Files
 
-        if self._initialized == False:
+        if not self._initialized:
             raise Exception("D2P instance not initialized.")
 
         if self._loaded:
@@ -123,16 +126,13 @@ class D2PFile:
         for file_name, position in self._files_position.items():
             self._stream.seek(position["offset"], 0)
 
-            self._files[file_name] = D2P_file_binary.read_bytes(position["length"])
+            self._files[file_name] = (D2P_file_binary.
+                                      read_bytes(position["length"]))
 
         self._loaded = True
 
-
-
     def build(self, stream):
-        """
-        Create the D2P represented by the class in the given stream.
-        """
+        """Create the D2P represented by the class in the given stream."""
         if self._template is None:
             raise RuntimeError("Template must be defined to build a D2P file")
 
@@ -159,7 +159,8 @@ class D2PFile:
         self._properties_offset = stream.tell()
         self._number_properties = 0
 
-        for property_type, property_value in self._template._properties.items():
+        for (property_type, property_value in
+             self._template._properties.items()):
             D2P_file_build_binary.write_string(property_type.encode())
             D2P_file_build_binary.write_string(property_value.encode())
             self._number_properties += 1
@@ -171,7 +172,7 @@ class D2PFile:
         D2P_file_build_binary.write_uint32(self._properties_offset)
         D2P_file_build_binary.write_uint32(self._number_properties)
 
-    #Accessors
+    # Accessors
 
     def _get_stream(self):
         return self._stream
@@ -194,35 +195,41 @@ class D2PFile:
     def _get_loaded(self):
         return self._loaded
 
-    #Mutators
+    # Mutators
 
     def _set_properties(self, properties):
         if isinstance(properties, OrderedDict):
             self._properties = properties
         else:
-            raise TypeError("Properties must be a dictionnary of byte object. (Property => Value)")
+            raise TypeError("Properties must be a dictionnary of byte"
+                            " object. (Property => Value)")
 
     def _set_files(self, files):
         if isinstance(files, OrderedDict):
             self._files = files
             self._files_position = OrderedDict()
 
-            #Update positions
+            # Update positions
             actual_offset = 0
 
             for file_name, file_ in self._files.items():
-                self._files_position[file_name] = {"offset" : actual_offset, "length" : len(file_)}
+                self._files_position[file_name] = {
+                    "offset": actual_offset,
+                    "length": len(file_)
+                }
                 actual_offset += self._files_position[file_name]["length"]
         else:
-            raise TypeError("Files must be a dictionnary of byte object. (FileName => Bytes)")
+            raise TypeError("Files must be a dictionnary of byte"
+                            " object. (FileName => Bytes)")
 
     def _set_template(self, template):
         if isinstance(template, D2PFile):
             self._template = template
         else:
-            raise TypeError("Template must be an instance of the D2PFile class.")
+            raise TypeError("Template must be an instance of the"
+                            " D2PFile class.")
 
-    #Properties
+    # Properties
 
     stream = property(_get_stream)
     properties = property(_get_properties, _set_properties)
@@ -231,15 +238,3 @@ class D2PFile:
     template = property(_get_template, _set_template)
     initialized = property(_get_initialized)
     loaded = property(_get_loaded)
-
-if __name__ == "__main__":
-    D2P_template_stream = open("./sample.d2p", "rb")
-    D2P_template = D2PFile()
-    D2P_template.populate(D2P_template_stream)
-
-    D2P_stream = open("./sample_compiled.d2p", "wb")
-    D2P = D2PFile()
-    D2P.template = D2P_template #Specify the template D2P file
-    D2P.files = D2P_template.files #Specify the files that will be builded {Filename => ByteArray of your file}
-    D2P.build(D2P_stream)
-    input()

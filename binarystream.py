@@ -3,12 +3,14 @@
 
 from struct import *
 
+
 class BinaryStream:
-    def __init__(self, base_stream, big_endian = False):
+    """Allow some binary operations on a stream opened in binary mode"""
+    def __init__(self, base_stream, big_endian=False):
         self._base_stream = base_stream
         self._big_endian = big_endian
 
-    #Write part
+    # Write functions
 
     def write_bytes(self, value):
         self._base_stream.write(value)
@@ -58,12 +60,12 @@ class BinaryStream:
             fmt = "<" + fmt
         return self.write_bytes(pack(fmt, data))
 
-    #Read part
+    # Read functions
 
     def read_byte(self):
         return self._base_stream.read(1)
 
-    def read_bytes(self, length = None):
+    def read_bytes(self, length=None):
         if length is None:
             bytes = self._base_stream.read()
         else:
@@ -107,7 +109,7 @@ class BinaryStream:
         length = self.read_uint16()
         return self._unpack(str(length) + 's', length)
 
-    def _unpack(self, fmt, length = 1):
+    def _unpack(self, fmt, length=1):
         bytes = self.read_bytes(length)
         if self._big_endian:
             fmt = ">" + fmt
