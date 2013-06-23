@@ -62,10 +62,10 @@ class D2PFile:
         self._properties_offset = D2P_file_binary.read_uint32()
         self._number_properties = D2P_file_binary.read_uint32()
 
-        ((if self._base_offset == b"" or self._base_length == b"" or
-          self._indexes_offset == b"" or self._number_indexes == b"" or
-          self._properties_offset == b"" or
-          self._number_properties == b"")):
+        if ((self._base_offset == b"" or self._base_length == b"" or
+             self._indexes_offset == b"" or self._number_indexes == b"" or
+             self._properties_offset == b"" or
+             self._number_properties == b"")):
             raise D2PInvalidFile("The file doesn't match the D2P pattern.")
 
         self._stream.seek(self._indexes_offset, 0)
@@ -159,10 +159,9 @@ class D2PFile:
         self._properties_offset = stream.tell()
         self._number_properties = 0
 
-        (for property_type, property_value in
-         self._template._properties.items()):
-            D2P_file_build_binary.write_string(property_type.encode())
-            D2P_file_build_binary.write_string(property_value.encode())
+        for ppty_type, ppty_value in self._template._properties.items():
+            D2P_file_build_binary.write_string(ppty_type.encode())
+            D2P_file_build_binary.write_string(ppty_value.encode())
             self._number_properties += 1
 
         D2P_file_build_binary.write_uint32(self._base_offset)
