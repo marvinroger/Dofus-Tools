@@ -5,7 +5,7 @@ import unittest
 import hashlib
 import os
 
-from pydofus.d2p import *
+from pydofus.d2p import D2PReader, D2PBuilder, InvalidD2PFile
 from pydofus.swl import SWLReader, SWLBuilder, InvalidSWLFile
 
 
@@ -54,32 +54,27 @@ class Test(unittest.TestCase):
         self.assertEqual(original, builded)
 
     def test_decompile_good_d2p(self):
-        D2P_stream = open("./samples/sample.d2p", "rb")
-        D2P_file = D2P()
-        D2P_file.init(D2P_stream, False)
-        D2P_file.load()
-        D2P_stream.close()
+        stream = open("./samples/sample.d2p", "rb")
+        D2P = D2PReader(stream, False)
+        D2P.load()
+        stream.close()
 
     def test_decompile_bad_d2p(self):
-        D2P_stream = open("./samples/bad.d2p", "rb")
-        D2P_File = D2P()
-        self.assertRaises(InvalidD2PFile, D2P_File.init, D2P_stream, False)
-        self.assertRaises(Exception, D2P_File.load)
-        D2P_stream.close()
+        stream = open("./samples/bad.d2p", "rb")
+        self.assertRaises(InvalidD2PFile, D2PReader, stream, False)
+        stream.close()
 
     def test_build_d2p(self):
-        D2P_template_stream = open("./samples/sample.d2p", "rb")
-        D2P_template = D2P()
-        D2P_template.init(D2P_template_stream)
+        template_stream = open("./samples/sample.d2p", "rb")
+        template = D2PReader(template_stream)
 
-        D2P_stream = open("./sample_compiled.d2p", "wb")
-        D2P_File = D2P()
-        D2P_File.template = D2P_template
-        D2P_File.files = D2P_template.files
-        D2P_File.build(D2P_stream)
+        builded_stream = open("./sample_compiled.d2p", "wb")
+        builder = D2PBuilder(template, builded_stream)
+        builder.files = template.files
+        builder.build()
 
-        D2P_template_stream.close()
-        D2P_stream.close()
+        template_stream.close()
+        builded_stream.close()
 
     def test_builded_d2p(self):
         originalf = open("./samples/sample.d2p", 'rb')

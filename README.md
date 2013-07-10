@@ -13,16 +13,15 @@ A D2P file contains the resources of the game, like audio, sprites or SWL files.
 #####Decompilation
 
 ```python
-from D2P import *
+from pydofus.d2p import D2PReader, InvalidD2PFile
 
-D2P_stream = open("./samples/sample.d2p", "rb") #Open the D2P file in binary mode
-D2P = D2PFile()
+stream = open("./samples/sample.d2p", "rb")  # Open the D2P file in binary mode
 try:
-	D2P.init(D2P_stream, False) #Init the D2P object with a D2P file. Must be a stream (Init = get D2P informations, if second parameter is True, load() is called auto)
-    D2P.load() #Populate the D2P object with the actual files in the above given D2P stream. (Load = load files in the D2P in RAM)
-    for name, file_ in D2P.files.items():
-		pass #Do whatever you want with name the name of the file and file_ a ByteArray containing the file
-except D2PInvalidFile: #Raised when the D2P file is incorrect
+    D2P = D2PFile(D2P_stream, False)  # Init the D2P object with a D2P file. Must be a stream (Init = get D2P informations, if second parameter is True, load() is called auto)
+    D2P.load()  # Populate the D2P object with the actual files in the above given D2P stream. (Load = load files in the D2P in RAM)
+    for name, specs in D2P.files.items():
+		pass  # Do whatever you want with name the name of the file and specs, which is {position: {offset: <int>, length: <int>}, (if loaded)binary: ByteArray}
+except D2PInvalidFile:  # Raised when the D2P file is incorrect
     pass
 ```
 
@@ -32,17 +31,18 @@ To build a D2P file, you have to know that D2P files contain some properties tha
 So, in order to build a D2P file, you have to specify the template D2P object that contains the properties.
 
 ```python
-from D2P import *
+from pydofus.d2p import D2PReader, D2PBuilder, InvalidD2PFile
 
-D2P_template_stream = open("./samples/sample.d2p", "rb")
-D2P_template = D2PFile()
-D2P_template.init(D2P_template_stream) #Second parameter is optional, by default it loads too
+template_stream = open("./samples/sample.d2p", "rb")
+template = D2PReader(template_stream)  # Second parameter is optional, by default it loads too
 
-D2P_stream = open("./sample_compiled.d2p", "wb")
-D2P = D2PFile()
-D2P.template = D2P_template #Specify the template D2P file
-D2P.files = D2P_template.files #Specify the files that will be builded {Filename => ByteArray of your file}
-D2P.build(D2P_stream)
+builded_stream = open("./sample_compiled.d2p", "wb")
+builder = D2PBuilder(template, builded_stream)
+#builder.files =  #Specify the files that will be build {Filename => ByteArray of your file, etc}
+#Here, we don't do anything so it loads the template files by default
+D2P.build()
+template_stream.close()
+builded_stream.close()
 ```
 
 The above exemple build the same file as the template as it build the same files. D2P builded file will be exactly the same as the original file. (Checksums are same)
@@ -54,12 +54,12 @@ A SWL file contains one and only one SWF file. This is a packaged filetype that 
 #####Decompilation
 
 ```python
-from SWL import *
+from pydofus.swl import SWLReader, InvalidSWLFile
 
-SWL_stream = open("./samples/sample.swl", "rb") #Open the SWL file in binary mode
-SWL = SWLFile()
+stream = open("./samples/sample.swl", "rb") #Open the SWL file in binary mode
+SWL = SWLReader()
 try:
-    SWL.ini(SWL_stream) #Populate the SWL object with a SWL file. Must be a stream
+    SWL = SWLReader(stream) #Populate the SWL object with a SWL file. Must be a stream
     SWF = SWL.SWF #SWF is a ByteArray containing the SWF file
 except SWLInvalidFile: #Raised when the SWL file is incorrect
     pass
@@ -71,17 +71,18 @@ To build a SWL file, you have to know that SWL files contain some properties (Ve
 So, in order to build a SWL file, you have to specify the template SWL object that contains the properties.
 
 ```python
-from SWL import *
+from pydofus.swl import SWLReader, SWLBuilder, InvalidSWLFile
 
-SWL_template_stream = open("./samples/sample.swl", "rb")
-SWL_template = SWLFile()
-SWL_template.init(SWL_template_stream)
+template_stream = open("./samples/sample.swl", "rb")
+template = SWLReader(template_stream)
 
-SWL_stream = open("./sample_compiled.swl", "wb")
-SWL = SWLFile()
-SWL.template = SWL_template #Specify the template SWL file
-SWL.SWF = SWL_template.SWF #Specify the SWF file that will be builded (ByteArray)
-SWL.build(SWL_stream)
+builded_stream = open("./sample_compiled.swl", "wb")
+builder = SWLBuilder(template, builded_stream)
+#builder.SWF =  #Specify the SWF that will be build (<ByteArray>)
+#Here, we don't do anything so it loads the template SWF by default
+builder.build()
+template_stream.close()
+builded_stream.close()
 ```
 
 The above exemple build the same file as the template as it build the same SWF file. SWL builded file will be exactly the same as the original file. (Checksums are same)
